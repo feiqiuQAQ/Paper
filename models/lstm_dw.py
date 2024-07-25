@@ -57,7 +57,7 @@ class MyModelWithDynamicWeights(nn.Module):
         return torch.stack(state_outs, dim=1), torch.stack(reward_outs, dim=1), h_state
 
     def loss(self, state_prediction, reward_prediction, b_y, state_mask, reward_mask):
-        state_loss = MaskedMSE()(state_prediction, b_y[:, :, :11], state_mask)
+        state_loss = MaskedMSE()(state_prediction, b_y[:, :, :self.num_features], state_mask)
         reward_loss = MaskedMSE()(reward_prediction, b_y[:, :, -1].unsqueeze(2), reward_mask)
         loss = self.awl(state_loss, reward_loss)
         return loss

@@ -11,6 +11,7 @@ from models.DoubleDueling_dqn import *
 from models.DuelingNet import *
 from utils.train_utils import *
 from utils.test_utils import *
+import argparse
 
 
 def env_train(training_data_path, model_name, epochs, num_features, input_size, hidden_size, LR, batch_size):
@@ -104,13 +105,15 @@ def dqn_train(memory_capacity, TRARGE_REPLACE_INTER, dqn_batch_size,
     )
 
     # 绘制结果
-    plot_dqn(score, mean_actions,  strategy, save_img_path=save_img_path)
+    plot_dqn(score, mean_actions, strategy, save_img_path=save_img_path)
 
     # 记录行为策略
-    record_behavior_all(dqn, init_bundle, action_mean, action_std, device, simulator=simulator, save_img_path=save_img_path)
+    record_behavior_all(dqn, init_bundle, action_mean, action_std, device, simulator=simulator,
+                        save_img_path=save_img_path)
 
 
 if __name__ == '__main__':
+
     conf = Config()
     # env_train 参数
     batch_size = conf.batch_size
@@ -118,7 +121,6 @@ if __name__ == '__main__':
     hidden_size = conf.hidden_size
     LR = conf.LR
     epochs = conf.epochs
-    model_name = conf.model_name
     num_features = conf.num_features
     device = conf.device
     test_data_path = conf.test_data_path
@@ -127,7 +129,7 @@ if __name__ == '__main__':
     save_test_path = conf.save_test_path
     # env_train(training_data_path=training_data_path, model_name=model_name, epochs=epochs, num_features=num_features, input_size=input_size, hidden_size=hidden_size, LR=LR, batch_size=batch_size)
 
-# ----------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------
     # dqn_train 参数
     epsilon = conf.epsilon
     epsilon_min = conf.epsilon_min
@@ -153,9 +155,35 @@ if __name__ == '__main__':
 
     simulator = conf.simulator
 
-    dqn_train(memory_capacity=memory_capacity, TRARGE_REPLACE_INTER=TRARGE_REPLACE_INTER,
-              dqn_batch_size=dqn_batch_size, n_states=n_states, n_actions=n_actions,
-              dqn_lr=dqn_lr, device=device, epsilon=epsilon, epsilon_min=epsilon_min,
-              epsilon_decay=epsilon_decay, gamma=gamma,  save_img_path=save_img_path)
 
-    # test_model(test_data_path=test_data_path, model_path=model_path, num_features=num_features, save_test_path=save_test_path)
+    # 创建 ArgumentParser 对象
+    parser = argparse.ArgumentParser(description='这是一个示例程序，用于展示如何接收命令行参数。')
+
+    # 添加参数
+    parser.add_argument('--w', type=str, help='输入训练类型')
+    parser.add_argument('--t', type=str, default='train', help='这是一个可选参数，默认值为 default_value')
+    parser.add_argument('--m', type=str, default='fixed', help='这是一个可选参数，默认值为 default_value')
+
+    # 解析命令行参数
+    args = parser.parse_args()
+    model_name = args.m
+
+    if args.w == "env":
+        if args.t == "train":
+            print(f'开始训练环境模拟器，模型为{model_name}')
+            print('-------------------------------------------------------------------------------------')
+            env_train(training_data_path=training_data_path, model_name=model_name, epochs=epochs,
+                      num_features=num_features, input_size=input_size, hidden_size=hidden_size,
+                      LR=LR, batch_size=batch_size)
+        else:
+            print('开始测试环境模拟器')
+            test_model(test_data_path=test_data_path, model_path=model_path, num_features=num_features,
+                       save_test_path=save_test_path)
+    else:
+        print('开始训练DQN')
+        dqn_train(memory_capacity=memory_capacity, TRARGE_REPLACE_INTER=TRARGE_REPLACE_INTER,
+                  dqn_batch_size=dqn_batch_size, n_states=n_states, n_actions=n_actions,
+                  dqn_lr=dqn_lr, device=device, epsilon=epsilon, epsilon_min=epsilon_min,
+                  epsilon_decay=epsilon_decay, gamma=gamma, save_img_path=save_img_path)
+
+
