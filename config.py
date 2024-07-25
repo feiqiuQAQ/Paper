@@ -10,6 +10,7 @@ class Config:
     epochs = 1000
     training_data_path = "./data/train_new_723.pkl"
     save_path = "./result/models"
+    save_test_path = "./result/img/test"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model_name = 'fixed'
     # 状态数
@@ -17,7 +18,8 @@ class Config:
     # 测试参数
     test_data_path = './data/test_new_723.pkl'
     model_path = './result/models/fixed_best.pth'
-# --------------------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------------------
     # dqn参数
     epsilon = 1
     epsilon_min = 0.01
@@ -35,12 +37,15 @@ class Config:
     # strategy
     strategy_list = ["ucb", "boltzmann", "entropy", "noise", "epsilon"]
     strategy = strategy_list[4]
-    data_time = "723"
+
     # 消费行为模拟器
     simulator_model = f"./result/models/fixed_best.pth"
 
+    # 结果图保存
+    save_img_path = f"./result/img/train_dqn"
+
     # 数据地址
-    data_path = f"./data/DQN_data_new_{data_time}.csv"
+    data_path = f"./data/DQN_data_new_723.csv"
 
     # 加载模拟器
     simulator = torch.load(simulator_model, map_location=torch.device('cpu'))

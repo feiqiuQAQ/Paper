@@ -4,6 +4,7 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from utils.mkdir_utils import *
 
 
 def train(epochs, model, train_loader, val_loader, loss_func, optimizer, model_name, num_features, device):
@@ -165,7 +166,6 @@ def train_model(dqn, simulator, init_bundle, action_mean, action_std, reward_mea
             s_ = pred_s.data.squeeze()
             r = pre_r.data * reward_std + reward_mean
 
-
             dqn.store_transition(s, a.unsqueeze(1), r.squeeze(1), s_)
 
             ep_score += r.squeeze()
@@ -182,7 +182,7 @@ def train_model(dqn, simulator, init_bundle, action_mean, action_std, reward_mea
     return score, mean_actions
 
 
-def plot_dqn(score, mean_actions, data_time, strategy):
+def plot_dqn(score, mean_actions,  strategy, save_img_path):
     window_size = 50
 
     def moving_average(data, window_size):
@@ -198,8 +198,7 @@ def plot_dqn(score, mean_actions, data_time, strategy):
     lower_bound = smoothed_losses - confidence_interval
     upper_bound = smoothed_losses + confidence_interval
 
-    now = datetime.now()
-    formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")
+    save_img_path = mkdir(save_img_path)
 
     plt.figure(figsize=(12, 6))
     x = np.arange(window_size - 1, len(score))
@@ -209,7 +208,7 @@ def plot_dqn(score, mean_actions, data_time, strategy):
     plt.xlabel('Epoch')
     plt.ylabel('Average Score')
     plt.legend()
-    plt.savefig(f'result/img/1.png')
+    plt.savefig(f'{save_img_path}/loss.png')
     plt.show()
 
     plt.figure(figsize=(12, 5))
@@ -226,12 +225,11 @@ def plot_dqn(score, mean_actions, data_time, strategy):
     plt.title('Mean Action Over Episodes')
 
     plt.tight_layout()
-    plt.savefig(f'result/img/{strategy}_2.png')
+    plt.savefig(f'{save_img_path}/{strategy}_loss_and_action.png')
     plt.show()
 
 
-def record_behavior(dqn, init_bundle, action_mean, action_std, device,simulator,num_consumers=3, days=7 ):
-
+def record_behavior(dqn, init_bundle, action_mean, action_std, device, simulator, num_consumers=3, days=7):
     consumer_indices = np.random.choice(init_bundle.shape[0], num_consumers, replace=False)
     selected_states = torch.FloatTensor(init_bundle[consumer_indices]).to(device)
 
@@ -263,3 +261,6 @@ def record_behavior(dqn, init_bundle, action_mean, action_std, device,simulator,
     plt.legend()
     plt.savefig(f'result/img/3.png')
     plt.show()
+
+
+

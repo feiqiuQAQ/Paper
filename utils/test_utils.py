@@ -6,9 +6,10 @@ from matplotlib import pyplot as plt
 from datas.DataLoder import MyDataSet
 from datas.padsequence import PadSequence
 from models.lstm_dw import *
+from utils.mkdir_utils import *
 
 
-def test_model(test_data_path, model_path, num_features):
+def test_model(test_data_path, model_path, num_features, save_test_path):
     pkl_file = open(test_data_path, 'rb')
     test_batch_data = pickle.load(pkl_file)
     pkl_file.close()
@@ -50,10 +51,49 @@ def test_model(test_data_path, model_path, num_features):
 
     plt.plot(list(true_rewards[0]), label='True Rewards')
     plt.plot(list(pred_rewards[0]), label='Predicted Rewards')
-
+    save_test_path = mkdir(save_test_path)
     plt.xlabel('Day')
     plt.ylabel('Reward')
     plt.title('True and Predicted Rewards')
-    plt.savefig(f'result/img/test_lstm_fixed.png')
+    plt.savefig(f'{save_test_path}/test_lstm_fixed.png')
     plt.legend()
+    plt.show()
+
+
+def record_behavior_all(dqn, init_bundle, action_mean, action_std, device, simulator,  save_img_path, days=24):
+    # 使用所有个体的状态
+    selected_states = torch.FloatTensor(init_bundle).to(device)
+
+    h_state = None
+    # 记录每天所有个体的行为
+    all_actions = torch.zeros((init_bundle.shape[0], days), dtype=torch.float32, device=device)
+
+    for day in range(days):
+        actions = dqn.choose_action(selected_states)
+        all_actions[:, day] = actions
+
+        actions = torch.tensor(actions, dtype=torch.float32).to(device)
+
+        a_for_simulator = torch.unsqueeze((actions - action_mean) / action_std, dim=1)
+        input_tensor = torch.cat((selected_states, a_for_simulator), dim=1)
+
+        length = torch.ones(input_tensor.size(0), dtype=torch.long, device=device)
+        input_tensor = torch.unsqueeze(input_tensor, dim=1)  # 添加批次维度
+        length = length.to(device)
+
+        pred_s, _, h_state = simulator(input_tensor, length, h_state)
+        selected_states = pred_s.squeeze()
+
+    # 计算每天的行为均值
+    mean_actions = all_actions.mean(dim=0)
+    save_img_path = mkdir(save_img_path)
+    # 绘制整个群体的行为均值
+    plt.figure(figsize=(12, 8))
+    plt.plot(mean_actions.cpu().numpy(), label='Mean Action')
+
+    plt.xlabel('Day')
+    plt.ylabel('Action')
+    plt.title('Mean Behavior Strategy of All Consumers Over 30 Days')
+    plt.legend()
+    plt.savefig(f'{save_img_path}/mean_behavior.png')
     plt.show()

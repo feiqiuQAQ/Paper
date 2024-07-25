@@ -71,7 +71,7 @@ def env_train(training_data_path, model_name, epochs, num_features, input_size, 
 
 def dqn_train(memory_capacity, TRARGE_REPLACE_INTER, dqn_batch_size,
               n_states, n_actions, dqn_lr, device, epsilon, epsilon_min,
-              epsilon_decay, gamma, data_time):
+              epsilon_decay, gamma, save_img_path):
     # 设置随机种子
     seed = 15
     random.seed(seed)
@@ -104,10 +104,10 @@ def dqn_train(memory_capacity, TRARGE_REPLACE_INTER, dqn_batch_size,
     )
 
     # 绘制结果
-    plot_dqn(score, mean_actions, data_time, strategy)
+    plot_dqn(score, mean_actions,  strategy, save_img_path=save_img_path)
 
     # 记录行为策略
-    record_behavior(dqn, init_bundle, action_mean, action_std, device, simulator=simulator)
+    record_behavior_all(dqn, init_bundle, action_mean, action_std, device, simulator=simulator, save_img_path=save_img_path)
 
 
 if __name__ == '__main__':
@@ -123,6 +123,9 @@ if __name__ == '__main__':
     device = conf.device
     test_data_path = conf.test_data_path
     model_path = conf.model_path
+    training_data_path = conf.training_data_path
+    save_test_path = conf.save_test_path
+    # env_train(training_data_path=training_data_path, model_name=model_name, epochs=epochs, num_features=num_features, input_size=input_size, hidden_size=hidden_size, LR=LR, batch_size=batch_size)
 
 # ----------------------------------------------------------------------------------------
     # dqn_train 参数
@@ -145,14 +148,14 @@ if __name__ == '__main__':
 
     strategy = conf.strategy
 
-    data_time = conf.data_time
     data_path = conf.data_path
+    save_img_path = conf.save_img_path
 
     simulator = conf.simulator
-    #
-    # dqn_train(memory_capacity=memory_capacity, TRARGE_REPLACE_INTER=TRARGE_REPLACE_INTER,
-    #           dqn_batch_size=dqn_batch_size, n_states=n_states, n_actions=n_actions,
-    #           dqn_lr=dqn_lr, device=device, epsilon=epsilon, epsilon_min=epsilon_min,
-    #           epsilon_decay=epsilon_decay, gamma=gamma, data_time=data_time)
 
-    test_model(test_data_path=test_data_path, model_path=model_path, num_features=num_features)
+    dqn_train(memory_capacity=memory_capacity, TRARGE_REPLACE_INTER=TRARGE_REPLACE_INTER,
+              dqn_batch_size=dqn_batch_size, n_states=n_states, n_actions=n_actions,
+              dqn_lr=dqn_lr, device=device, epsilon=epsilon, epsilon_min=epsilon_min,
+              epsilon_decay=epsilon_decay, gamma=gamma,  save_img_path=save_img_path)
+
+    # test_model(test_data_path=test_data_path, model_path=model_path, num_features=num_features, save_test_path=save_test_path)
