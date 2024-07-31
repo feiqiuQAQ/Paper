@@ -3,20 +3,20 @@ import torch
 
 class Config:
     # 输入特征数 包含action
-    input_size = 9
+    input_size = 10
     LR = 0.005
     batch_size = 64
     hidden_size = 50
-    epochs = 1000
-    training_data_path = "./data/train_new_723.pkl"
-    save_path = "./result/models"
-    save_test_path = "./result/img/test"
+    epochs = 100
+    training_data_path = "./data/train_year_731.pkl"
+    save_path = "./result/models/year_731"
+    save_test_path = "./result/img/test/year_731"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model_name = 'fixed'
     # 状态数
-    num_features = 8
+    num_features = 9
     # 测试参数
-    test_data_path = './data/test_new_723.pkl'
+    test_data_path = './data/test_year_731.pkl'
     model_path = './result/models/fixed_best.pth'
 
     # --------------------------------------------------------------------------------------

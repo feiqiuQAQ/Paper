@@ -160,7 +160,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='这是一个示例程序，用于展示如何接收命令行参数。')
 
     # 添加参数
-    parser.add_argument('--w', type=str, help='输入训练类型')
+    parser.add_argument('--w', type=str, help='输入训练类型', default='env')
     parser.add_argument('--t', type=str, default='train', help='这是一个可选参数，默认值为 default_value')
     parser.add_argument('--m', type=str, default='fixed', help='这是一个可选参数，默认值为 default_value')
 
