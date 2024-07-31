@@ -17,7 +17,7 @@ class Config:
     num_features = 9
     # 测试参数
     test_data_path = './data/test_year_731.pkl'
-    model_path = './result/models/fixed_best.pth'
+    model_path = f'./result/models/{model_name}_best.pth'
 
     # --------------------------------------------------------------------------------------
     # dqn参数

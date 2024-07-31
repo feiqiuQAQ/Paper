@@ -72,7 +72,7 @@ def env_train(training_data_path, model_name, epochs, num_features, input_size, 
 
 def dqn_train(memory_capacity, TRARGE_REPLACE_INTER, dqn_batch_size,
               n_states, n_actions, dqn_lr, device, epsilon, epsilon_min,
-              epsilon_decay, gamma, save_img_path):
+              epsilon_decay, gamma, save_img_path, epochs):
     # 设置随机种子
     seed = 15
     random.seed(seed)
@@ -178,12 +178,13 @@ if __name__ == '__main__':
         else:
             print('开始测试环境模拟器')
             test_model(test_data_path=test_data_path, model_path=model_path, num_features=num_features,
-                       save_test_path=save_test_path)
+                       save_test_path=save_test_path, model_name=model_name)
     else:
         print('开始训练DQN')
         dqn_train(memory_capacity=memory_capacity, TRARGE_REPLACE_INTER=TRARGE_REPLACE_INTER,
                   dqn_batch_size=dqn_batch_size, n_states=n_states, n_actions=n_actions,
                   dqn_lr=dqn_lr, device=device, epsilon=epsilon, epsilon_min=epsilon_min,
+                  epochs=dqn_epochs,
                   epsilon_decay=epsilon_decay, gamma=gamma, save_img_path=save_img_path)
 
 

@@ -9,7 +9,7 @@ from models.lstm_dw import *
 from utils.mkdir_utils import *
 
 
-def test_model(test_data_path, model_path, num_features, save_test_path):
+def test_model(test_data_path, model_path, num_features, save_test_path, model_name):
     pkl_file = open(test_data_path, 'rb')
     test_batch_data = pickle.load(pkl_file)
     pkl_file.close()
@@ -55,7 +55,7 @@ def test_model(test_data_path, model_path, num_features, save_test_path):
     plt.xlabel('Day')
     plt.ylabel('Reward')
     plt.title('True and Predicted Rewards')
-    plt.savefig(f'{save_test_path}/test_lstm_fixed.png')
+    plt.savefig(f'{save_test_path}/test_lstm_{model_name}.png')
     plt.legend()
     plt.show()
 
