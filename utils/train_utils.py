@@ -7,13 +7,13 @@ from datetime import datetime
 from utils.mkdir_utils import *
 
 
-def train(epochs, model, train_loader, val_loader, loss_func, optimizer, model_name, num_features, device):
+
+def train(epochs, model, train_loader, val_loader, loss_func, optimizer, model_name, num_features, device, save_path):
     model.to(device)
     train_loss_record = []
     val_loss_record = []
     h_state = None
     best_val_loss = float('inf')
-
     for epoch in range(epochs):
         model.train()
         epoch_loss = 0
@@ -83,10 +83,8 @@ def train(epochs, model, train_loader, val_loader, loss_func, optimizer, model_n
 
         if val_epoch_loss < best_val_loss:
             best_val_loss = val_epoch_loss
-            torch.save(model, f'result/models/{model_name}_best.pth')
+            torch.save(model, f'{save_path}/{model_name}_best.pth')
             print(f"Saved best {model_name} model with validation loss: {best_val_loss}")
-
-    torch.save(model, f'result/models/{model_name}_{epochs}.pth')
 
     plot(train_loss_record, val_loss_record, model_name)
 
@@ -106,7 +104,7 @@ def plot(train_loss_record, val_loss_record, model_name):
     plt.grid(True, which='both', linestyle='--', linewidth=0.7)  # 添加网格线
     plt.tight_layout()  # 自动调整子图参数，使之填充整个图像区域
 
-    plt.savefig(f'./result/img/loss_{model_name}.png')
+    plt.savefig(f'./result/img/loss_{model_name}_{get_time()}.png')
     plt.show()
     print('保存成功')
 
@@ -114,7 +112,7 @@ def plot(train_loss_record, val_loss_record, model_name):
 def load_and_preprocess_data(data_path, num_features):
     data = pd.read_csv(data_path)
     # init = data.groupby("顾客ID").first().reset_index()
-    init = data.groupby("编号").first().reset_index()
+    init = data.groupby("ID").first().reset_index()
     data_array = data.values
     data_mean = data_array.mean(axis=0)
     data_std = data_array.std(axis=0)
@@ -174,7 +172,7 @@ def train_model(dqn, simulator, init_bundle, action_mean, action_std, reward_mea
 
             s = s_
 
-        ave_ep_score = ep_score.mean().item() / 10
+        ave_ep_score = ep_score.mean().item() / 30
         print(i_episode, ave_ep_score, np.mean(ep_actions))
         score.append(ave_ep_score)
         mean_actions.append(np.mean(ep_actions))
@@ -208,7 +206,7 @@ def plot_dqn(score, mean_actions,  strategy, save_img_path):
     plt.xlabel('Epoch')
     plt.ylabel('Average Score')
     plt.legend()
-    plt.savefig(f'{save_img_path}/loss.png')
+    plt.savefig(f'{save_img_path}/loss_{get_time()}.png')
     plt.show()
 
     plt.figure(figsize=(12, 5))
@@ -225,7 +223,7 @@ def plot_dqn(score, mean_actions,  strategy, save_img_path):
     plt.title('Mean Action Over Episodes')
 
     plt.tight_layout()
-    plt.savefig(f'{save_img_path}/{strategy}_loss_and_action.png')
+    plt.savefig(f'{save_img_path}/{strategy}_loss_and_action_{get_time()}.png')
     plt.show()
 
 
@@ -259,7 +257,7 @@ def record_behavior(dqn, init_bundle, action_mean, action_std, device, simulator
     plt.ylabel('Action')
     plt.title('Behavior Strategy of 3 Consumers Over 30 Days')
     plt.legend()
-    plt.savefig(f'result/img/3.png')
+    plt.savefig(f'result/img/3_{get_time()}.png')
     plt.show()
 
 

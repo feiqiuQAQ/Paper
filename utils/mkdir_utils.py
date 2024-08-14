@@ -18,3 +18,11 @@ def mkdir(save_path):
         print(f'文件夹 "{folder_path}" 已存在。')
 
     return folder_path
+    
+def get_time():
+    # 获取当前时间
+    now = datetime.now()
+    
+    # 格式化为“月-日-时间”格式
+    formatted_time = now.strftime("%m-%d-%H:%M:%S")
+    return formatted_time

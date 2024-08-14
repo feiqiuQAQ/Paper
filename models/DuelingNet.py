@@ -29,20 +29,20 @@ class DuelingNet(nn.Module):
         super(DuelingNet, self).__init__()
 
         self.shared_layers = nn.Sequential(
-            nn.Linear(n_states, 300),
+            nn.Linear(n_states, 200),
             nn.ReLU()
         )
 
         self.attention = Attention(300)
 
         self.advantage = nn.Sequential(
-            nn.Linear(300, 128),
+            nn.Linear(200, 128),
             nn.ReLU(),
             nn.Linear(128, n_actions)
         )
 
         self.value = nn.Sequential(
-            nn.Linear(300, 128),
+            nn.Linear(200, 128),
             nn.ReLU(),
             nn.Linear(128, 1)
         )

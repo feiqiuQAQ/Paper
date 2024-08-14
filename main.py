@@ -14,7 +14,7 @@ from utils.test_utils import *
 import argparse
 
 
-def env_train(training_data_path, model_name, epochs, num_features, input_size, hidden_size, LR, batch_size):
+def env_train(training_data_path, model_name, epochs, num_features, input_size, hidden_size, LR, batch_size, save_path):
     with open(training_data_path, 'rb') as pkl_file:
         train_batch_data = pickle.load(pkl_file)
 
@@ -57,24 +57,24 @@ def env_train(training_data_path, model_name, epochs, num_features, input_size, 
 
         train(epochs=epochs, model=model_fixed, model_name=model_name, train_loader=train_loader, val_loader=val_loader,
               loss_func=loss_func,
-              optimizer=optimizer_fixed, device=device, num_features=num_features)
+              optimizer=optimizer_fixed, device=device, num_features=num_features, save_path=save_path)
     elif model_name == 'dw':
         train(epochs=epochs, model=model_dynamic, model_name=model_name, train_loader=train_loader,
               val_loader=val_loader,
               loss_func=loss_func,
-              optimizer=optimizer_dynamic, device=device, num_features=num_features)
+              optimizer=optimizer_dynamic, device=device, num_features=num_features,save_path=save_path)
     else:
         train(epochs=epochs, model=model_dwa, model_name=model_name, train_loader=train_loader,
               val_loader=val_loader,
               loss_func=loss_func,
-              optimizer=optimizer_dwa, device=device, num_features=num_features)
+              optimizer=optimizer_dwa, device=device, num_features=num_features,save_path=save_path)
 
 
 def dqn_train(memory_capacity, TRARGE_REPLACE_INTER, dqn_batch_size,
               n_states, n_actions, dqn_lr, device, epsilon, epsilon_min,
-              epsilon_decay, gamma, save_img_path):
+              epsilon_decay, gamma, save_img_path, epochs):
     # 设置随机种子
-    seed = 15
+    seed = 114
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -127,6 +127,7 @@ if __name__ == '__main__':
     model_path = conf.model_path
     training_data_path = conf.training_data_path
     save_test_path = conf.save_test_path
+    save_path = conf.save_path
     # env_train(training_data_path=training_data_path, model_name=model_name, epochs=epochs, num_features=num_features, input_size=input_size, hidden_size=hidden_size, LR=LR, batch_size=batch_size)
 
     # ----------------------------------------------------------------------------------------
@@ -153,11 +154,10 @@ if __name__ == '__main__':
     data_path = conf.data_path
     save_img_path = conf.save_img_path
 
-    simulator = conf.simulator
-
+    simulator_model = conf.simulator_model
 
     # 创建 ArgumentParser 对象
-    parser = argparse.ArgumentParser(description='这是一个示例程序，用于展示如何接收命令行参数。')
+    parser = argparse.ArgumentParser(description='接收命令行参数。')
 
     # 添加参数
     parser.add_argument('--w', type=str, help='输入训练类型', default='env')
@@ -167,6 +167,7 @@ if __name__ == '__main__':
     # 解析命令行参数
     args = parser.parse_args()
     model_name = args.m
+    model_path = f'{save_path}/{model_name}_best.pth'
 
     if args.w == "env":
         if args.t == "train":
@@ -174,16 +175,17 @@ if __name__ == '__main__':
             print('-------------------------------------------------------------------------------------')
             env_train(training_data_path=training_data_path, model_name=model_name, epochs=epochs,
                       num_features=num_features, input_size=input_size, hidden_size=hidden_size,
-                      LR=LR, batch_size=batch_size)
+                      LR=LR, batch_size=batch_size, save_path=save_path)
         else:
             print('开始测试环境模拟器')
             test_model(test_data_path=test_data_path, model_path=model_path, num_features=num_features,
                        save_test_path=save_test_path)
     else:
         print('开始训练DQN')
+        simulator = torch.load(simulator_model, map_location=torch.device('cpu'))
         dqn_train(memory_capacity=memory_capacity, TRARGE_REPLACE_INTER=TRARGE_REPLACE_INTER,
                   dqn_batch_size=dqn_batch_size, n_states=n_states, n_actions=n_actions,
-                  dqn_lr=dqn_lr, device=device, epsilon=epsilon, epsilon_min=epsilon_min,
-                  epsilon_decay=epsilon_decay, gamma=gamma, save_img_path=save_img_path)
+                  epochs=dqn_epochs,dqn_lr=dqn_lr, device=device, epsilon=epsilon, 
+                  epsilon_min=epsilon_min,epsilon_decay=epsilon_decay, gamma=gamma, save_img_path=save_img_path)
 
 
